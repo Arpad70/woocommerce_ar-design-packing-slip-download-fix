@@ -1,0 +1,65 @@
+name: Release Packing Slip Download Fix
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Verify Build
+        run: |
+          find . -name '*.php' -print0 | xargs -0 -n1 php -l
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          PLUGIN_VERSION="$(sed -n "s/^ \* Version: //p" ar-design-packing-slip-download-fix.php | tr -d '\r\n')"
+          if [ "$VERSION" != "$PLUGIN_VERSION" ]; then
+            echo "VERSION file ($VERSION) does not match plugin header ($PLUGIN_VERSION)." >&2
+            exit 1
+          fi
+
+      - name: Resolve Version
+        id: version
+        run: |
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          TAG="v$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" != "$TAG" ]; then
+            echo "Git tag does not match VERSION file. Expected $TAG but got ${{ github.ref_name }}." >&2
+            exit 1
+          fi
+
+      - name: Build Release Zip
+        run: |
+          rm -rf /tmp/ar-design-packing-slip-download-fix-release
+          mkdir -p /tmp/ar-design-packing-slip-download-fix-release/ar-design-packing-slip-download-fix
+          rsync -a ./ /tmp/ar-design-packing-slip-download-fix-release/ar-design-packing-slip-download-fix/ --exclude='.git' --exclude='.github' --exclude='.DS_Store'
+          cd /tmp/ar-design-packing-slip-download-fix-release
+          zip -r ar-design-packing-slip-download-fix.zip ar-design-packing-slip-download-fix
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: AR Design Packing Slip Download Fix ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          target_commitish: ${{ github.sha }}
+          files: |
+            /tmp/ar-design-packing-slip-download-fix-release/ar-design-packing-slip-download-fix.zip
