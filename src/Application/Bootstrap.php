@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ArDesign\PackingSlipDownloadFix\Application;
 
+defined( 'ABSPATH' ) || exit;
+
 use ArDesign\PackingSlipDownloadFix\Presentation\Admin\PackingSlipDownloadButton;
 use ArDesign\PackingSlipDownloadFix\Support\Updates\GitHubUpdater;
 use ArDesign\PackingSlipDownloadFix\Support\Updates\RollbackManager;
@@ -45,7 +47,7 @@ final class Bootstrap
 	public function run(): void
 	{
 		add_action( 'init', array( $this, 'loadTextDomain' ) );
-		add_action( 'plugins_loaded', array( $this, 'bootstrapRuntime' ), 20 );
+		add_action( 'woocommerce_loaded', array( $this, 'bootstrapRuntime' ), 20 );
 	}
 
 	public function loadTextDomain(): void
@@ -59,6 +61,10 @@ final class Bootstrap
 
 	public function bootstrapRuntime(): void
 	{
+		if ( ! function_exists( 'WC' ) ) {
+			return;
+		}
+
 		$this->updater->register();
 		$this->rollback_manager->register();
 

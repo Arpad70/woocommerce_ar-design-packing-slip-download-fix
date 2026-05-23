@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ArDesign\PackingSlipDownloadFix\Presentation\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 final class PackingSlipDownloadButton
 {
 	public function register(): void
