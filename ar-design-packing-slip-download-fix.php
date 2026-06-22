@@ -3,7 +3,7 @@
  * Plugin Name: Ar Design Packing Slip Download Fix
  * Plugin URI: https://github.com/Arpad70/woocommerce_ar-design-packing-slip-download-fix
  * Description: Pridáva tlačidlo na stiahnutie dodacieho listu do detailu WooCommerce objednávky po jeho vygenerovaní.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: Arpád Horák
  * Author URI: https://arpad-horak.cz
  * Developer: Arpád Horák
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ARD_PACKING_SLIP_FIX_VERSION', '0.1.1' );
+define( 'ARD_PACKING_SLIP_FIX_VERSION', '0.1.2' );
 define( 'ARD_PACKING_SLIP_FIX_FILE', __FILE__ );
 define( 'ARD_PACKING_SLIP_FIX_BASENAME', plugin_basename( __FILE__ ) );
 define( 'ARD_PACKING_SLIP_FIX_PATH', plugin_dir_path( __FILE__ ) );
